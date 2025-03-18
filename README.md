@@ -1,6 +1,8 @@
-# Audit GitHub workflow runs for an org or Enterprise, using the audit log
+# Audit GitHub workflow runs for an organization, Enterprise or repository
 
-Check the audit log for a GitHub Enterprise or organization for workflow runs, listing the Actions and specific versions and commits used in them.
+Check the audit log for a GitHub Enterprise/organization (or just list the runs, for a repository) for workflow runs created between the start date and end date.
+
+Lists the Actions and specific versions and commits used in them.
 
 Optionally, filter by a particular action, possibly including a commit SHA of interest.
 
@@ -15,8 +17,8 @@ Set a `GITHUB_TOKEN` in the environment with appropriate access to the audit log
 
 For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.com/api/v3`
 
-```bash
-node audit_workflow_runs.js <org or enterprise name> <"ent" or "org"> <start date> <end date> [<action>] [<commit SHA>]
+```text
+node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<action>] [<commit SHA>]
 ```
 
 Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson`.
