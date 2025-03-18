@@ -19,6 +19,8 @@ For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in y
 node audit_workflow_runs.js <org or enterprise name> <"ent" or "org"> <start date> <end date> [<action>] [<commit SHA>]
 ```
 
+Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson`.
+
 For example:
 
 ```bash

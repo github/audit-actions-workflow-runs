@@ -1,3 +1,3 @@
 node_modules/
 .DS_Store
-workflow_audit_results.json
+workflow_audit_results.sljson

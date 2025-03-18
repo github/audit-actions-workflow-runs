@@ -97,36 +97,51 @@ async function* auditOrganizationWithoutAuditLog(orgName, startDate, endDate) {
 
     for (const repo of repos.data) {
       // Step 2: Get all workflow runs in the repository within the date range
-      try {
-            const workflowRuns = await octokit.actions.listWorkflowRunsForRepo({
-                owner: orgName,
-                repo: repo.name,
-                per_page: 100,
-                created: `${startDate}..${endDate}`,
-            });
-
-            for (const run of workflowRuns.data.workflow_runs) {
-                // Step 3: Get the logs for the workflow run
-                const actions = await extractActionsFromLogs(run.logs_url);
-        
-                const action_run_results = await createActionsRunResults(
-                    orgName,
-                    repo.name,
-                    run,
-                    actions
-                );
-                
-                for (const result of action_run_results) {
-                    yield result;
-                }
-            }
-      } catch (error) {
-        continue;
+      for await (const result of _auditRepo(orgName, repo.name, startDate, endDate)) {
+        yield result;
       }
     }
   } catch (error) {
     console.error("Error auditing organization:", error.message);
   }
+}
+
+// audit a single repository
+async function* auditRepo(repoName, startDate, endDate) {
+    const [org, repo] = repoName.split("/");
+
+    for await (const result of _auditRepo(org, repo, startDate, endDate)) {
+        yield result;
+    }
+}
+
+// audit a single repository, using the orgname and repo name
+async function* _auditRepo(org, repo, startDate, endDate) {
+    try {
+        const workflowRuns = await octokit.actions.listWorkflowRunsForRepo({
+            owner: org,
+            repo: repo,
+            per_page: 100,
+            created: `${startDate}..${endDate}`,
+        });
+
+        for (const run of workflowRuns.data.workflow_runs) {
+            const actions = await extractActionsFromLogs(run.logs_url);
+
+            const action_run_results = await createActionsRunResults(
+                org,
+                repo,
+                run,
+                actions
+            );
+            
+            for (const result of action_run_results) {
+                yield result;
+            }
+        }
+    } catch (error) {
+    console.error("Error auditing repo:", error.message);
+    }
 }
 
 // use the Enterprise/Organization audit log to list all workflow runs in that period
@@ -181,18 +196,18 @@ async function main() {
     const args = process.argv.slice(2);
 
     if (args.length < 4) {
-        console.error("Usage: node main.js <org-or-ent-name> <org|ent> <start-date> <end-date> [<action-name>] [<action-commit-sha>]");
+        console.error("Usage: node main.js <org-or-ent-name> <org|ent|repo> <start-date> <end-date> [<action-name>] [<action-commit-sha>]");
         return;
     }
 
     const [orgOrEntName, orgOrEnt, startDate, endDate] = args;
 
-    if (!['ent', 'org'].includes(orgOrEnt)) {
-        console.error("<org|ent|repo> must be 'ent', 'org'");
+    if (!['ent', 'org', 'repo'].includes(orgOrEnt)) {
+        console.error("<org|ent|repo> must be 'ent', 'org', 'repo'");
         return;
     }
 
-    const action_run_results = auditEnterpriseOrOrg(orgOrEntName, orgOrEnt, startDate, endDate);
+    const action_run_results = orgOrEnt != 'repo' ? auditEnterpriseOrOrg(orgOrEntName, orgOrEnt, startDate, endDate) : auditRepo(orgOrEntName, startDate, endDate);
 
     for await (const result of action_run_results) {
         if (args.length >= 5) {
@@ -207,7 +222,7 @@ async function main() {
 
         console.log(Object.values(result).join(","));
         fs.appendFileSync(
-            "workflow_audit_results.json",
+            "workflow_audit_results.sljson",
             JSON.stringify(result) + "\n"
         );
     }
