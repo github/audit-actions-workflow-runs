@@ -209,6 +209,8 @@ async function main() {
 
     const action_run_results = orgOrEnt != 'repo' ? auditEnterpriseOrOrg(orgOrEntName, orgOrEnt, startDate, endDate) : auditRepo(orgOrEntName, startDate, endDate);
 
+    console.log("org,repo,workflow,run_id,created_at,name,version,sha");
+
     for await (const result of action_run_results) {
         if (args.length >= 5) {
             const [actionName, actionSha] = args.slice(4);
