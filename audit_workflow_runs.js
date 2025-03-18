@@ -1,12 +1,78 @@
 import { Octokit } from "@octokit/rest";
 import fs from "fs";
 import AdmZip from "adm-zip";
+import { log } from "console";
 
 // Initialize Octokit with a personal access token
 const octokit = new Octokit({
   auth: process.env.GITHUB_TOKEN, // Set your GitHub token in an environment variable
   baseUrl: process.env.GITHUB_BASE_URL  // Set the GitHub base URL, e.g. for Enterprise Server, in an env var
 });
+
+function searchForActionsLines(entry, actionRegex) {
+    const logContent = entry.getData().toString("utf8"); // Extract file content as a string
+    const logLines = logContent.split("\n");
+    const actions = [];
+
+    for (const line of logLines) {
+        const data = line.split(" ").slice(1).join(" ");
+        if (data == undefined) {
+            continue;
+        }
+        if (data.startsWith("Download action repository '")) {
+            const match = actionRegex.exec(data);
+            if (match) {
+                const action = match[1];
+                const sha = match[2];
+
+                const [repo, version] = action.split("@");
+                actions.push([repo, version, sha]);
+            }
+        }
+    }
+
+    return actions;
+}
+
+function searchForSetUpJob(logEntries, actionRegex) {
+    let foundSetUpJob = false;
+    const actions = [];
+
+    // Iterate through each file in the zip
+    for (const entry of logEntries) {
+        if (!entry.isDirectory) {
+            const fileName = entry.entryName; // Get the file name
+            if (fileName === undefined) {
+                continue;
+            }
+            // get the base name of the file
+            const baseName = fileName.split("/").pop();
+            if (baseName == "1_Set up job.txt") {
+                foundSetUpJob = true;
+                actions.push(...searchForActionsLines(entry, actionRegex));
+            }
+        }
+    }
+
+    return [foundSetUpJob, actions];
+}
+
+function searchForTopLevelLog(logEntries, actionRegex) {
+    const actions = [];
+
+    // Iterate through each file in the zip
+    for (const entry of logEntries) {
+        if (!entry.isDirectory) {
+            const fileName = entry.entryName; // Get the file name
+            console.log(fileName);
+            if (fileName !== undefined && fileName.startsWith("0_")) {
+                actions.push(...searchForActionsLines(entry, actionRegex));
+            }
+        }
+    }
+
+    return actions;
+}
 
 // Helper function to extract Actions used from workflow logs
 async function extractActionsFromLogs(logUrl) {
@@ -23,29 +89,14 @@ async function extractActionsFromLogs(logUrl) {
     const logEntries = zip.getEntries(); // Get all entries in the zip file
 
     // Download action repository 'actions/checkout@v4' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
-    const actionRegex = /Download action repository '(.+?)' \(SHA:(.+?)\)/g;
-    const actions = [];
+    const actionRegex = /Download action repository '(.+?)' \(SHA:(.+?)\)/;
 
-    // Iterate through each file in the zip
-    for (const entry of logEntries) {
-        if (!entry.isDirectory) {
-          const fileName = entry.entryName; // Get the file name
-          // get the base name of the file
-          const baseName = fileName.split("/").pop();
-          if (baseName == "1_Set up job.txt") {
-            const logContent = entry.getData().toString("utf8"); // Extract file content as a string
-            let match;
-            // Extract actions from the log content
-            while (match = actionRegex.exec(logContent)) {
-                const action = match[1];
-                const sha = match[2];
+    const [success, actions] = searchForSetUpJob(logEntries, actionRegex);
+    
+    if (!success) {
+        actions.push(...searchForTopLevelLog(logEntries, actionRegex));
+    }
 
-                const [repo, version] = action.split("@");
-                actions.push([repo, version, sha]);
-            }
-          }
-        }
-      }
     return actions;
 
   } catch (error) {
