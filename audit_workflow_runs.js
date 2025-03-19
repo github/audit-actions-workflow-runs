@@ -13,6 +13,7 @@ function searchForActionsLines(entry, actionRegex) {
     const logContent = entry.getData().toString("utf8"); // Extract file content as a string
     const logLines = logContent.split("\n");
     const actions = [];
+    let foundActions = false;
 
     for (const line of logLines) {
         const data = line.split(" ").slice(1).join(" ");
@@ -20,6 +21,7 @@ function searchForActionsLines(entry, actionRegex) {
             continue;
         }
         if (data.startsWith("Download action repository '")) {
+            foundActions = true;
             const match = actionRegex.exec(data);
             if (match) {
                 const action = match[1];
@@ -28,6 +30,9 @@ function searchForActionsLines(entry, actionRegex) {
                 const [repo, version] = action.split("@");
                 actions.push([repo, version, sha]);
             }
+        // quit processing the log after the first line that is not an action, if we already found actions
+        } else if (foundActions) {
+            break;
         }
     }
 
