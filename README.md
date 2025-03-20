@@ -28,3 +28,13 @@ For example:
 ```bash
 node audit_workflow_runs.js github org 2025-03-13 2025-03-15 tj-actions/changed-files 0e58ed8671d6b60d0890c21b07f8835ace038e67
 ```
+
+## Changelog
+
+### 2025-05-20 15:10Z
+
+Made searching for Actions downloads more efficient. The search now stops after any consecutive lines seen that show an Action was downloaded, and avoids searching the rest of the log file.
+
+### 2025-05-18 18:30Z
+
+Added searching for logs in the top level `0_` file, if the `1_Set up job.txt` is no longer available in the logs zip file
