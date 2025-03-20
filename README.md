@@ -13,9 +13,11 @@ Optionally, filter by a particular action, possibly including a commit SHA of in
 
 ## Usage
 
-Set a `GITHUB_TOKEN` in the environment with appropriate access to the audit log on your org or Enterprise.
+For all scripts, you must set a `GITHUB_TOKEN` in the environment with appropriate access to the audit log on your org or Enterprise, or the repository you are interested in.
 
 For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.com/api/v3`
+
+### audit_workflow_runs.js
 
 ```text
 node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<action>] [<commit SHA>]
@@ -27,6 +29,24 @@ For example:
 
 ```bash
 node audit_workflow_runs.js github org 2025-03-13 2025-03-15 tj-actions/changed-files 0e58ed8671d6b60d0890c21b07f8835ace038e67
+```
+
+### find_compromised_secrets.js
+
+This script takes the output of `audit_workflow_runs.js` and searches for secrets that were used in a workflow run.
+
+Take the output from the single-line JSON file for any known compromised Actions and run it through this script.
+
+```text
+node find_compromised_secrets.js < <path sljson file>
+```
+
+Results are printed to the console, and written to a file in the current directory, named `compromised_secrets.sljson`.
+
+For example:
+
+```bash
+node find_compromised_secrets.js < workflow_audit_results.sljson
 ```
 
 ## Changelog

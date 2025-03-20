@@ -1,9 +1,12 @@
 
 // base64 strings were used to leak the secrets
-export const base64Regex =
-  /^(?:[A-Za-z0-9+/]{4}){5,}(?:|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)$/;
+export const base64Regex1 =
+  /^(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
 
-export function findSecretsInLines(lines, base64Regex) {
+export const base64Regex2 =
+  /^(?:[A-Za-z0-9+/]{4}){10,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
+
+export function findSecretsInLines(lines) {
   const secrets = [];
           
   for (const line of lines) {
@@ -18,7 +21,7 @@ export function findSecretsInLines(lines, base64Regex) {
       continue;
     }
 
-    const match = base64Regex.exec(data);
+    const match = base64Regex1.exec(data);
     if (!match) {
         continue;
     }
@@ -28,8 +31,9 @@ export function findSecretsInLines(lines, base64Regex) {
     try {
         const decodedOnce = Buffer.from(secret, "base64").toString();
 
-        const match2 = base64Regex.exec(decodedOnce);
+        const match2 = base64Regex2.exec(decodedOnce);
         if (!match2) {
+            console.log("Failed to match base64 data after first decode: " + decodedOnce);
             continue;
         }
 
@@ -42,6 +46,7 @@ export function findSecretsInLines(lines, base64Regex) {
                 secrets.push(jsonDecoded);
             }
         } catch (error) {
+            console.log("Failed to decode JSON data after second decode: " + decoded);
             continue;
         }
     } catch (error) {

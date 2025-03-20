@@ -101,6 +101,11 @@ async function main() {
       continue;
     }
   }
+
+  for (const secret of all_secrets) {
+    // write to a file
+    fs.appendFileSync("compromised_secrets.sljson", JSON.stringify(secret) + "\n");
+  }
 }
 
 await main();
