@@ -33,9 +33,11 @@ node audit_workflow_runs.js github org 2025-03-13 2025-03-15 tj-actions/changed-
 
 ### find_compromised_secrets.js
 
-This script takes the output of `audit_workflow_runs.js` and searches for secrets that were used in a workflow run.
+This is relevant only to secrets leaked in the `tj-actions/changed-files` or `reviewdog` compromises in March 2025.
 
-Take the output from the single-line JSON file for any known compromised Actions and run it through this script.
+This script takes the output of `audit_workflow_runs.js` and searches for secrets that were leaked in a workflow run.
+
+Take the output from the single-line JSON file for any known-compromised Actions and run it through this script.
 
 ```text
 node find_compromised_secrets.js < <path sljson file>
