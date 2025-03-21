@@ -43,7 +43,7 @@ async function extractSecretsFromLogs(logUrl) {
 
           let lines = logContent.split("\n");
 
-          secrets.push(...findSecretsInLines(lines, base64Regex));
+          secrets.push(...findSecretsInLines(lines));
         }
       }
     }
