@@ -1,4 +1,6 @@
-# Audit GitHub workflow runs for an organization, Enterprise or repository
+# Audit GitHub Actions used in workflow runs for an organization, Enterprise or repository
+
+Discover which exact versions (down to the commit) of GitHub Actions were used in workflow runs.
 
 Check the audit log for a GitHub Enterprise/organization (or just list the runs, for a repository) for workflow runs created between the start date and end date.
 
