@@ -7,9 +7,7 @@ Lists the Actions and specific versions and commits used in them.
 Optionally, filter by a particular action, possibly including a commit SHA of interest.
 
 > [!NOTE]
-> Not supported by GitHub
-
-(C) Copyright GitHub, Inc.
+> This is unofficial software, not supported by GitHub
 
 ## Usage
 
@@ -33,11 +31,12 @@ node audit_workflow_runs.js github org 2025-03-13 2025-03-15 tj-actions/changed-
 
 ### find_compromised_secrets.js
 
-This is relevant only to secrets leaked in the `tj-actions/changed-files` or `reviewdog` compromises in March 2025.
+> [!NOTE]
+> This is relevant only to secrets leaked after the `tj-actions/changed-files` and `reviewdog` compromises in March 2025.
 
-This script takes the output of `audit_workflow_runs.js` and searches for secrets that were leaked in a workflow run.
+This script takes the output of `audit_workflow_runs.js` and searches for secrets that were leaked in those workflow runs.
 
-Take the output from the single-line JSON file for any known-compromised Actions and run it through this script.
+You should take the output from the single-line JSON file for any known-compromised Actions and run it through this script.
 
 ```text
 node find_compromised_secrets.js < <path sljson file>
@@ -52,6 +51,10 @@ node find_compromised_secrets.js < workflow_audit_results.sljson
 ```
 
 ## Changelog
+
+### 2025-05-20 18:15Z
+
+Added script to allow decoding secrets from workflows affected by a particular set of compromises in March 2025.
 
 ### 2025-05-20 15:10Z
 
