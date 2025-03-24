@@ -353,8 +353,6 @@ async function main() {
     }
   }
 
-  console.debug("Actions to audit:", actionsToAudit);
-
   const outputFilename = argsOutputFilename || "workflow_audit_results.sljson";
 
   const action_run_results =
