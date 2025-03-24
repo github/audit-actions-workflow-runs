@@ -10,7 +10,7 @@ They were doubly-Base64 encoded, so we need to spot Base64 strings and decode th
 import { Octokit } from "@octokit/rest";
 import fs from "fs";
 import AdmZip from "adm-zip";
-import { findSecretsInLines, base64Regex } from "./find_compromised_secrets_helper.js";
+import { findSecretsInLines } from "./find_compromised_secrets_helper.js";
 
 // Initialize Octokit with a personal access token
 const octokit = new Octokit({
@@ -59,8 +59,9 @@ async function main() {
   const args = process.argv.slice(2);
 
   if (args.length > 0) {
+    const script_name = process.argv[1].split("/").pop();
     console.error(
-      "Usage: node find_compromised_secrets.js < <input file>"
+      `Usage: node ${script_name} < <SLJSON input file>`
     );
     return;
   }

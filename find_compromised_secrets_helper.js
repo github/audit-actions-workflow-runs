@@ -1,19 +1,22 @@
 
 // base64 strings were used to leak the secrets
 export const base64Regex1 =
-  /^(?:[A-Za-z0-9+/]{4}){16,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
+  /^SW[A-Za-z0-9+/]{2}(?:[A-Za-z0-9+/]{4}){15,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
 
 export const base64Regex2 =
-  /^(?:[A-Za-z0-9+/]{4}){10,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
+  /^I[A-Za-z0-9+/]{3}(?:[A-Za-z0-9+/]{4}){9,}(?:[A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)\s*$/;
 
 export function findSecretsInLines(lines) {
   const secrets = [];
+
+  let foundSecrets = false;
           
   for (const line of lines) {
     if (line == "") {
       continue;
     }
 
+    // separate the timestamp from the data
     const data = line.split(" ").slice(1).join(" ");
 
     if (data == undefined) {
@@ -23,6 +26,10 @@ export function findSecretsInLines(lines) {
 
     const match = base64Regex1.exec(data);
     if (!match) {
+        // stop processing the log after the first line that does not match the regex, if we already found secrets
+        if (foundSecrets) {
+            break
+        }
         continue;
     }
     const secret = match[0];
@@ -43,6 +50,7 @@ export function findSecretsInLines(lines) {
         try {
             const jsonDecoded = JSON.parse("{" + decoded + "}");
             if (Object.keys(jsonDecoded).length > 0) {
+                foundSecrets = true;
                 secrets.push(jsonDecoded);
             }
         } catch (error) {
