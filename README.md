@@ -27,6 +27,12 @@ node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date>
 
 Results are printed to the console in CSV, for convenience, and also appended to a single-line JSON file in the current directory. This is named `workflow_audit_results.sljson` by default, and can be set with the optional `output-file` parameter.
 
+The CSV output has the headers:
+
+```csv
+org,repo,workflow,run_id,created_at,name,version,sha
+```
+
 By default all Actions are listed, but you can filter by particular Actions using a JSON formatted input file.
 
 For example:
