@@ -299,21 +299,49 @@ function matchActionsToAuditTargets(result, actionsToAudit) {
   const sha = result.sha;
 
   const [owner, repo] = name.split("/");
+  const path = name.split("/").slice(2).join("/");
 
   const owners = Object.keys(actionsToAudit);
+
+  let matchedRepo = "";
+  let matchedPath = "";
 
   if (owners.includes(owner)) {
     const repos = Object.keys(actionsToAudit[owner]);
 
     if (repos.includes(repo) || repos.includes("*")) {
-      const hashes = actionsToAudit[owner][repo] ?? actionsToAudit[owner]["*"];
+      matchedRepo = repos.includes(repo) ? repo : "*";
 
-      if (hashes.includes(sha) || hashes.includes("*") || hashes.length == 0) {
-          return true;
+      const paths = Object.keys(actionsToAudit[owner][matchedRepo]);
+
+      if (paths.includes(path) || paths.includes("*") || paths.includes("")) {
+        matchedPath = paths.includes(path) ? path : (paths.includes("*") ? "*" : "");
+
+        const hashes = actionsToAudit[owner][matchedRepo][matchedPath];
+
+        if (hashes.includes(sha) || hashes.includes("*") || hashes.length == 0) {
+            return true;
+        }
       }
     }
   }
   return false;
+}
+
+function parseFromInputFile(actionsToAuditFilename) {
+  const actionsToAudit = {};
+  if (actionsToAuditFilename) {
+    const actionsToAuditFile = fs.readFileSync(actionsToAuditFilename, "utf-8");
+    const actionsToAuditRaw = JSON.parse(actionsToAuditFile);
+    for (const [action, hashes] of Object.entries(actionsToAuditRaw)) {
+      const [org, repo] = action.split("/");
+      const path = action.split("/").slice(2).join("/");
+      actionsToAudit[org] ??= {};
+      actionsToAudit[org][repo] ??= {};
+      actionsToAudit[org][repo][path] = hashes;
+    }
+  }
+  return actionsToAudit;
 }
 
 async function main() {
@@ -333,8 +361,8 @@ async function main() {
     orgOrEnt,
     startDate,
     endDate,
-    actionsToAuditFilename,
     argsOutputFilename,
+    actionsToAuditFilename,
   ] = args;
 
   if (!["ent", "org", "repo"].includes(orgOrEnt)) {
@@ -342,16 +370,10 @@ async function main() {
     return;
   }
 
-  const actionsToAudit = {};
-  if (actionsToAuditFilename) {
-    const actionsToAuditFile = fs.readFileSync(actionsToAuditFilename, "utf-8");
-    const actionsToAuditRaw = JSON.parse(actionsToAuditFile);
-    for (const [action, hashes] of Object.entries(actionsToAuditRaw)) {
-      const [org, repo] = action.split("/");
-      actionsToAudit[org] = actionsToAudit[org] || {};
-      actionsToAudit[org][repo] = hashes;
-    }
-  }
+  const actionsToAudit = parseFromInputFile(actionsToAuditFilename);
+
+  console.log("Actions to audit:");
+    console.log(JSON.stringify(actionsToAudit, null, 2));
 
   const outputFilename = argsOutputFilename || "workflow_audit_results.sljson";
 

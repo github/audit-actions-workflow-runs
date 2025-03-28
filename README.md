@@ -20,25 +20,35 @@ For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in y
 ### audit_workflow_runs.js
 
 ```text
-node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<action>] [<commit SHA>]
+node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<output-file>] [<input-file>]
 ```
 
-Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson`.
+Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson` by default.
+
+By default all Actions are listed, but you can filter by particular Actions using a JSON formatted input file.
 
 For example:
 
 ```bash
-node audit_workflow_runs.js github org 2025-03-13 2025-03-15 tj-actions/changed-files 0e58ed8671d6b60d0890c21b07f8835ace038e67
+node audit_workflow_runs.js github org 2025-03-13 2025-03-15 github_actions_audit.json
 ```
+
+#### JSON input file format
+
+The JSON input file should an object with the keys being the name of the Action, and the value being an array of the commits you are interested in.
+
+Use the Action name in the format `owner/repo` or `owner/repo/path`, where `path` can contain any number of slashes.
+
+You can express some wildcards - use `*` after the first `/` in the Action to include all repositories under the owner, and use `*` in the commit array (or leave it empty) to include all commits.
+
+An Action name given without a path will match any Action in that repository, whether or not it has a path. You can also explictly use `*` in the path to match any path.
 
 ### find_compromised_secrets.js
 
 > [!NOTE]
-> This is relevant only to secrets leaked after the `tj-actions/changed-files` and `reviewdog` compromises in March 2025.
+> This is relevant only to secrets leaked because of the `tj-actions/changed-files` and `reviewdog` compromises in March 2025.
 
-This script takes the output of `audit_workflow_runs.js` and searches for secrets that were leaked in those workflow runs.
-
-You should take the output from the single-line JSON file for any known-compromised Actions and run it through this script.
+This script takes the structured single-line JSON output of `audit_workflow_runs.js` (not the convenience CSV output) and searches for secrets that were leaked in those workflow runs.
 
 ```text
 node find_compromised_secrets.js < <path sljson file>
@@ -53,6 +63,10 @@ node find_compromised_secrets.js < workflow_audit_results.sljson
 ```
 
 ## Changelog
+
+### 2025-05-28 15:30Z
+
+Updated audit script to take JSON input to filter by Actions and commits.
 
 ### 2025-05-20 18:15Z
 
