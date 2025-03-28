@@ -255,9 +255,6 @@ async function main() {
 
   const actionsToAudit = parseFromInputFile(actionsToAuditFilename);
 
-  console.log("Actions to audit:");
-  console.log(JSON.stringify(actionsToAudit, null, 2));
-
   const outputFilename = argsOutputFilename || "workflow_audit_results.sljson";
 
   const action_run_results =
