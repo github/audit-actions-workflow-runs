@@ -17,7 +17,7 @@ Clone this repository locally.
 
 For all scripts, you must set a `GITHUB_TOKEN` in the environment with appropriate access to the audit log on your org or Enterprise, or the repository you are interested in. It can be convenient to use the [`gh` CLI](https://cli.github.com/) to get a token, with [`gh auth login`](https://cli.github.com/manual/gh_auth_login) and [`gh auth token`](https://cli.github.com/manual/gh_auth_token).
 
-For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.com/api/v3`.
+For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.example/api/v3`.
 
 ### audit_workflow_runs.js
 
