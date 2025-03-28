@@ -4,6 +4,10 @@
 
 Updated audit script to take JSON input to filter by Actions and commits.
 
+Added unit tests for the audit script.
+
+Added supporting documentation.
+
 ## 2025-05-20
 
 Added script to allow decoding secrets from workflows affected by a particular set of compromises in March 2025.
