@@ -41,28 +41,46 @@ octokit.log.error = () => {};
 
 // Helper function to extract Actions used from workflow logs
 async function extractActionsFromLogs(logUrl) {
-  try {
-    const response = await octokit.request(`GET ${logUrl}`, {
-      headers: { Accept: "application/vnd.github+json" },
-    });
+  let retries = 3;
 
-    // get the zip file content
-    const zipBuffer = Buffer.from(response.data);
+  while (retries > 0) {
+    try {
+      const response = await octokit.request(`GET ${logUrl}`, {
+        headers: { Accept: "application/vnd.github+json" },
+      });
 
-    // Unzip the file
-    const zip = new AdmZip(zipBuffer);
-    const logEntries = zip.getEntries(); // Get all entries in the zip file
+      // get the zip file content
+      const zipBuffer = Buffer.from(response.data);
 
-    const [success, actions] = searchForSetUpJob(logEntries);
+      // Unzip the file
+      const zip = new AdmZip(zipBuffer);
+      const logEntries = zip.getEntries(); // Get all entries in the zip file
 
-    if (!success) {
-      actions.push(...searchForTopLevelLog(logEntries));
+      const [success, actions] = searchForSetUpJob(logEntries);
+
+      if (!success) {
+        actions.push(...searchForTopLevelLog(logEntries));
+      }
+
+      return actions;
+    } catch (error) {
+      if (error.status == 404) {
+        console.error(
+          `Failed to fetch logs from ${logUrl}: 404. This may be due to the logs being too old, or the workflow having not run due to an error.`
+        );
+        return [];
+      } else if (error.message.startsWith("Connect Timeout Error ") || error.message === "read ECONNRESET" || error.message === "read ETIMEDOUT") {
+        console.error(
+          `Connection timeout/reset. Retrying, attempt ${4 - retries}/3. Waiting 30 seconds...`
+        );
+        retries--;
+        // sleep 30 seconds
+        await new Promise((resolve) => setTimeout(resolve, 30000));
+        continue;
+      }
+      console.error(`Failed to fetch logs from ${logUrl}:`, error.message);
+      return [];
     }
-
-    return actions;
-  } catch (error) {
-    console.error(`Failed to fetch logs from ${logUrl}:`, error.message);
-    return [];
   }
 }
 
