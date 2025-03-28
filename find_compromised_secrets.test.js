@@ -1,5 +1,8 @@
 import assert from "assert";
-import { findSecretsInLines, base64Regex1 } from "./find_compromised_secrets_helper.js";
+import {
+  findSecretsInLines,
+  base64Regex1,
+} from "./find_compromised_secrets_utils.js";
 
 function testFindSecretsInLines() {
   console.log("Running test for findSecretsInLines...");
@@ -13,26 +16,27 @@ function testFindSecretsInLines() {
     "",
   ];
 
-  const data = "SWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+  const data =
+    "SWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
   const match = base64Regex1.exec(data);
-  
+
   assert(match, "Failed to match base64 data");
 
   // Expected secrets after decoding
   const expectedSecrets = [
     {
-        github_token: {
-            isSecret: true,
-            value: 'ghs_000000000000000000000000000000000'
-        }
+      github_token: {
+        isSecret: true,
+        value: "ghs_000000000000000000000000000000000",
+      },
     },
     {
-        "0": {
-            isSecret: true,
-            value: 'a'
-        }
-    }
+      0: {
+        isSecret: true,
+        value: "a",
+      },
+    },
   ];
 
   // Call the function
@@ -50,8 +54,8 @@ function testFindSecretsInLines() {
 
 // Run the test
 function main() {
-    console.log("Running tests...");
-    testFindSecretsInLines();
+  console.log("Running tests...");
+  testFindSecretsInLines();
 }
 
 main();

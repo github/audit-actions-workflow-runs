@@ -10,7 +10,7 @@ They were doubly-Base64 encoded, so we need to spot Base64 strings and decode th
 import { Octokit } from "@octokit/rest";
 import fs from "fs";
 import AdmZip from "adm-zip";
-import { findSecretsInLines } from "./find_compromised_secrets_helper.js";
+import { findSecretsInLines } from "./find_compromised_secrets_utils.js";
 
 // Initialize Octokit with a personal access token
 const octokit = new Octokit({
@@ -60,15 +60,13 @@ async function main() {
 
   if (args.length > 0) {
     const script_name = process.argv[1].split("/").pop();
-    console.error(
-      `Usage: node ${script_name} < <SLJSON input file>`
-    );
+    console.error(`Usage: node ${script_name} < <SLJSON input file>`);
     return;
   }
 
   // read the actions runs from STDIN, in single-line JSON format
   const actions_run_lines = fs.readFileSync(0).toString().split("\n");
-  
+
   const all_secrets = [];
 
   for (const line of actions_run_lines) {
@@ -82,22 +80,23 @@ async function main() {
       const owner = actions_run.org;
       const repo = actions_run.repo;
       const run_id = actions_run.run_id;
-  
+
       console.log(`Processing actions run ${owner}/${repo}#${run_id}...`);
 
       // get the logs for the run
       const logUrl = `/repos/${owner}/${repo}/actions/runs/${run_id}/logs`;
       const secrets = await extractSecretsFromLogs(logUrl);
 
-      console.log(`Found ${secrets.length} secrets in log for ${owner}/${repo}#${run_id}`);
+      console.log(
+        `Found ${secrets.length} secrets in log for ${owner}/${repo}#${run_id}`
+      );
 
       for (const secret of secrets) {
         console.log(secret);
       }
 
       all_secrets.push(...secrets);
-    }
-    catch (error) {
+    } catch (error) {
       console.error(`Failed to parse line: ${line}`);
       continue;
     }
@@ -105,7 +104,10 @@ async function main() {
 
   for (const secret of all_secrets) {
     // write to a file
-    fs.appendFileSync("compromised_secrets.sljson", JSON.stringify(secret) + "\n");
+    fs.appendFileSync(
+      "compromised_secrets.sljson",
+      JSON.stringify(secret) + "\n"
+    );
   }
 }
 

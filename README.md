@@ -6,7 +6,7 @@ Check the audit log for a GitHub Enterprise/organization (or just list the runs,
 
 Lists the Actions and specific versions and commits used in them.
 
-Optionally, filter by a particular action, possibly including a commit SHA of interest.
+Optionally, filter by particular Actions, possibly including one or more commit SHAs of interest.
 
 > [!NOTE]
 > This is unofficial software, not supported by GitHub
@@ -15,15 +15,15 @@ Optionally, filter by a particular action, possibly including a commit SHA of in
 
 For all scripts, you must set a `GITHUB_TOKEN` in the environment with appropriate access to the audit log on your org or Enterprise, or the repository you are interested in.
 
-For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.com/api/v3`
+For Enterprise Server or Data Residency users, please set `GITHUB_BASE_URL` in your environment, e.g. `https://github.acme-inc.com/api/v3`.
 
 ### audit_workflow_runs.js
 
 ```text
-node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<output-file>] [<input-file>]
+node audit_workflow_runs.js <org or enterprise name> <ent|org|repo> <start date> <end date> [<output-file>] [<input-filters-file>]
 ```
 
-Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson` by default.
+Results are printed to the console in CSV, and also appended to a file in the current directory, named `workflow_audit_results.sljson` by default. This can be set with the optional `output-file` parameter.
 
 By default all Actions are listed, but you can filter by particular Actions using a JSON formatted input file.
 
@@ -62,20 +62,23 @@ For example:
 node find_compromised_secrets.js < workflow_audit_results.sljson
 ```
 
-## Changelog
+## License
 
-### 2025-05-28 15:30Z
+This project is licensed under the terms of the MIT open source license. Please refer to the [LICENSE](LICENSE) for the full terms.
 
-Updated audit script to take JSON input to filter by Actions and commits.
+## Maintainers
 
-### 2025-05-20 18:15Z
+See [CODEOWNERS](CODEOWNERS) for the list of maintainers.
 
-Added script to allow decoding secrets from workflows affected by a particular set of compromises in March 2025.
+## Support
 
-### 2025-05-20 15:10Z
+> [!NOTE]
+> This is an _unofficial_ tool created by Field Security Specialists, and is not officially supported by GitHub.
 
-Made searching for Actions downloads more efficient. The search now stops after any consecutive lines seen that show an Action was downloaded, and avoids searching the rest of the log file.
+See the [SUPPORT](SUPPORT.md) file.
 
-### 2025-05-18 18:30Z
+## Background and acknowledgements
 
-Added searching for logs in the top level `0_` file, if the `1_Set up job.txt` is no longer available in the logs zip file
+The `changes` Action relies on the [`dorny/paths-filter`](https://github.com/dorny/paths-filter/) Action.
+
+See the [CHANGELOG](CHANGELOG.md), [CONTRIBUTING](CONTRIBUTING.md), [SECURITY](SECURITY.md), [SUPPORT](SUPPORT.md), [CODE OF CONDUCT](CODE_OF_CONDUCT.md) and [PRIVACY](PRIVACY.md) files for more information.
