@@ -8,5 +8,7 @@
   "type": "module",
   "scripts": {
     "test": "node audit_workflow_runs.test.js && node find_compromised_secrets.test.js"
-  }
+  },
+  "name": "@github/audit-actions-workflow-runs",
+  "version": "1.0.0"
 }
