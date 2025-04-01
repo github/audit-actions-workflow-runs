@@ -1,9 +1,0 @@
-{
-  "root": true,
-  "plugins": ["github"],
-  "extends": ["plugin:github/recommended", "plugin:github/typescript"],
-  "rules": {
-    "import/extensions": ["error", "never"],
-    "prettier/prettier": "off"
-  }
-}
