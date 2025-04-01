@@ -37,7 +37,8 @@ jobs:
           npm install eslint-plugin-github@4.10.1
 
       - name: Run ESLint
-        run: npx eslint .
+        run: |
+          npx eslint .
           --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif
