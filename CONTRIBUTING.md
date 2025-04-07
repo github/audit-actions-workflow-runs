@@ -24,7 +24,7 @@ Please fork the repository, and raise a Pull Request (PR) for review.
 
 Remember to update the [README](README.md) and [CHANGELOG](CHANGELOG.md).
 
-Your changes must be acceptable under the [LICENSE](LICENSE.md) of the project.
+Your changes must be acceptable under the [LICENSE](LICENSE) of the project.
 
 ## Code of conduct
 
