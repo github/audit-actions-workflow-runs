@@ -1,0 +1,3 @@
+{
+    "owner1/repo1/path/to/action": ["sha1", "sha2"]
+}
