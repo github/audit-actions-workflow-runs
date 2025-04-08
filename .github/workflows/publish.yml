@@ -6,11 +6,12 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@4.2.2
