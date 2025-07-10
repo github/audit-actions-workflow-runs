@@ -59,12 +59,17 @@ export function parseFromInputFile(actionsToAuditFilename) {
 }
 
 // Regex to spot, e.g. Download action repository 'actions/checkout@v4' (SHA:11bd71901bbe5b1630ceea73d27597364c9af683)
-const actionRegex = /^Download action repository '(.+?)' \(SHA:(.+?)\)/;
+const mutableActionPrefix = "Download action repository '";
+const mutableActionRegex = /^Download action repository '([^']+?)' \(SHA:([^)]+?)\)/;
+const immutableActionPrefix = "##[group]Download immutable action package '";
+const immutableActionRegex = /^##\[group\]Download immutable action package '([^']+?)'/;
 
 export function searchForActionsLines(logContent) {
   const logLines = logContent.split("\n");
   const actions = [];
   let foundActions = false;
+  let inImmutableGroup = false;
+  let immutableAction = {};
 
   for (const line of logLines) {
     // separate the timestamp from the data
@@ -72,9 +77,9 @@ export function searchForActionsLines(logContent) {
     if (data == undefined) {
       continue;
     }
-    if (data.startsWith("Download action repository '")) {
+    if (data.startsWith(mutableActionPrefix)) {
       foundActions = true;
-      const match = actionRegex.exec(data);
+      const match = mutableActionRegex.exec(data);
       if (match) {
         const action = match[1];
         const sha = match[2];
@@ -82,8 +87,40 @@ export function searchForActionsLines(logContent) {
         const [repo, version] = action.split("@");
         actions.push([repo, version, sha]);
       }
-      // quit processing the log after the first line that is not an action, if we already found actions
+    } else if (data.startsWith(immutableActionPrefix)) {
+      foundActions = true;
+      inImmutableGroup = true;
+      const match = immutableActionRegex.exec(data);
+      if (match) {
+        const action = match[1];
+        const tag = match[2];
+
+        immutableAction = {
+          action: action,
+          tag: tag,
+          version: null,
+          sha: null,
+          digest: null,
+        }
+      }
+    } else if (inImmutableGroup && data.startsWith("##[endgroup]")) {
+      actions.push([immutableAction.action, ])
+      inImmutableGroup = false;
+    } else if (inImmutableGroup) {
+      const versionMatch = data.match(/Version: ([a-zA-Z0-9._-]+)/);
+      const shaMatch = data.match(/Source commit SHA: ([a-f0-9]{40,})/);
+      const digestMatch = data.match(/Digest: sha256:[a-f0-9]{64}/);
+      if (versionMatch) {
+        immutableAction.version = versionMatch[1];
+      }
+      if (shaMatch) {
+        immutableAction.sha = shaMatch[1];
+      }
+      if (digestMatch) {
+        immutableAction.digest = digestMatch[0];
+      }
     } else if (foundActions) {
+      // quit processing the log after the first line that is not an action, if we already found actions
       break;
     }
   }
