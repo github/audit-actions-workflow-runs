@@ -86,8 +86,8 @@ function testSearchForActionsLines() {
 2025-03-28T12:00:02Z Some other log line
   `;
   const expected1 = [
-    ["actions/checkout", "v4", "11bd71901bbe5b1630ceea73d27597364c9af683"],
-    ["actions/setup-node", "v3", "22cd71901bbe5b1630ceea73d27597364c9af684"],
+    ["actions/checkout", "v4", "11bd71901bbe5b1630ceea73d27597364c9af683", null, null],
+    ["actions/setup-node", "v3", "22cd71901bbe5b1630ceea73d27597364c9af684", null, null],
   ];
   assert.deepStrictEqual(
     searchForActionsLines(logContent1),
@@ -112,7 +112,7 @@ function testSearchForActionsLines() {
 2025-03-28T12:00:02Z Download action repository 'actions/setup-node@v3' (SHA:22cd71901bbe5b1630ceea73d27597364c9af684)
   `;
   const expected3 = [
-    ["actions/checkout", "v4", "11bd71901bbe5b1630ceea73d27597364c9af683"],
+    ["actions/checkout", "v4", "11bd71901bbe5b1630ceea73d27597364c9af683", null, null],
   ];
   assert.deepStrictEqual(
     searchForActionsLines(logContent3),
@@ -133,7 +133,7 @@ function testSearchForActionsLines() {
   const logContent5 = `2025-03-28T12:00:00Z Download action repository 'actions/checkout@v4' (SHA:invalid_sha)
 2025-03-28T12:00:01Z Malformed log line
   `;
-  const expected5 = [["actions/checkout", "v4", "invalid_sha"]];
+  const expected5 = [["actions/checkout", "v4", "invalid_sha", null, null]];
   assert.deepStrictEqual(
     searchForActionsLines(logContent5),
     expected5,
@@ -207,7 +207,7 @@ function testSearchForActionsLines() {
   const expected6 = [
     ["actions/checkout", "v4", "11bd71901bbe5b1630ceea73d27597364c9af683", "4.2.2", "ccb2698953eaebd21c7bf6268a94f9c26518a7e38e27e0b83c1fe1ad049819b1"],
     ["actions/setup-java", "v4", "c5195efecf7bdfc987ee8bae7a71cb8b11521c00", "4.7.1", "23223d64943473efb4336f60463c0429cd4f422cd5fc6c48a5cf0d5907c1aeac"],
-    ["sbt/setup-sbt", "v1", "234370af1319038bf8dc432f8a7e4b83078a1781"],
+    ["sbt/setup-sbt", "v1", "234370af1319038bf8dc432f8a7e4b83078a1781", null, null],
     ["actions/cache", "v4", "5a3ec84eff668545956fd18022155c47e93e2684", "4.2.3", "c8a3bb963e1f1826d8fcc8d1354f0dd29d8ac1db1d4f6f20247055ae11b81ed9"],
   ];
   assert.deepStrictEqual(
