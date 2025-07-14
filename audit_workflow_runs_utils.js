@@ -62,7 +62,8 @@ export function parseFromInputFile(actionsToAuditFilename) {
 const mutableActionPrefix = "Download action repository '";
 const mutableActionRegex = /^Download action repository '([^']+?)' \(SHA:([^)]+?)\)/;
 const immutableActionPrefix = "##[group]Download immutable action package '";
-const immutableActionRegex = /^##\[group\]Download immutable action package '([^']+?)'/;
+const immutableActionRegex = /^##\[group\]Download immutable action package '([^'@]+?)@([^']*)'/;
+const gettingDownloadInfoLine = "Getting action download info";
 
 export function searchForActionsLines(logContent) {
   const logLines = logContent.split("\n");
@@ -104,12 +105,12 @@ export function searchForActionsLines(logContent) {
         }
       }
     } else if (inImmutableGroup && data.startsWith("##[endgroup]")) {
-      actions.push([immutableAction.action, ])
+      actions.push([immutableAction.action, immutableAction.tag, immutableAction.sha, immutableAction.version, immutableAction.digest]);
       inImmutableGroup = false;
     } else if (inImmutableGroup) {
       const versionMatch = data.match(/Version: ([a-zA-Z0-9._-]+)/);
       const shaMatch = data.match(/Source commit SHA: ([a-f0-9]{40,})/);
-      const digestMatch = data.match(/Digest: sha256:[a-f0-9]{64}/);
+      const digestMatch = data.match(/Digest: sha256:([a-f0-9]{64})/);
       if (versionMatch) {
         immutableAction.version = versionMatch[1];
       }
@@ -117,8 +118,11 @@ export function searchForActionsLines(logContent) {
         immutableAction.sha = shaMatch[1];
       }
       if (digestMatch) {
-        immutableAction.digest = digestMatch[0];
+        immutableAction.digest = digestMatch[1];
       }
+    } else if (data == gettingDownloadInfoLine) {
+      // continue processing the log until we find an action line
+      continue;
     } else if (foundActions) {
       // quit processing the log after the first line that is not an action, if we already found actions
       break;

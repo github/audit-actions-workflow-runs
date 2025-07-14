@@ -109,6 +109,8 @@ async function createActionsRunResults(owner, repo, run, actions) {
       name: action[0],
       version: action[1],
       sha: action[2],
+      immutable_version: action[3],
+      digest: action[4],
     });
   }
   return action_run_results;
@@ -280,7 +282,7 @@ async function main() {
       ? auditEnterpriseOrOrg(orgOrEntName, orgOrEnt, startDate, endDate)
       : auditRepo(orgOrEntName, startDate, endDate);
 
-  console.log("org,repo,workflow,run_id,created_at,name,version,sha");
+  console.log("org,repo,workflow,run_id,created_at,name,version,sha,immutable_version,digest");
 
   const checkActions = Object.keys(actionsToAudit).length > 0;
 
