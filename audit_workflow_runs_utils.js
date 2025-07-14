@@ -86,7 +86,7 @@ export function searchForActionsLines(logContent) {
         const sha = match[2];
 
         const [repo, version] = action.split("@");
-        actions.push([repo, version, sha]);
+        actions.push([repo, version, sha, null, null]);
       }
     } else if (data.startsWith(immutableActionPrefix)) {
       foundActions = true;
