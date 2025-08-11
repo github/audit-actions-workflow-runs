@@ -14,7 +14,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@4.2.2
+        uses: actions/checkout@v5.0.0
       - name: Setup Node
         uses: actions/setup-node@4.3.0
         with:
