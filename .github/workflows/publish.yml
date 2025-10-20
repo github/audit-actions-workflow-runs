@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@4.2.2
       - name: Setup Node
-        uses: actions/setup-node@v5.0.0
+        uses: actions/setup-node@v6.0.0
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
