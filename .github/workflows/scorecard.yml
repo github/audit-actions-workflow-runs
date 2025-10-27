@@ -49,7 +49,7 @@ jobs:
       # uploads of run results in SARIF format to the repository Actions tab.
       # https://docs.github.com/en/actions/advanced-guides/storing-workflow-data-as-artifacts
       - name: "Upload artifact"
-        uses: actions/upload-artifact@4.6.2
+        uses: actions/upload-artifact@v5.0.0
         with:
           name: SARIF file
           path: results.sarif
