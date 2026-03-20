@@ -1,7 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: 'npm'
-    directory: '/'
+    directory: '/' 
     schedule:
       interval: 'weekly'
     cooldown:
@@ -9,7 +9,15 @@ updates:
       semver-major-days: 21
       semver-minor-days: 14
       semver-patch-days: 7
+    groups:
+      npm-dependencies:
+        patterns:
+          - "*"
   - package-ecosystem: 'github-actions'
-    directory: '/'
+    directory: '/' 
     schedule:
       interval: 'weekly'
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
