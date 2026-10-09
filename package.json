@@ -1,9 +1,9 @@
 {
   "dependencies": {
-    "@octokit/core": "^7.0.6",
-    "@octokit/plugin-throttling": "^11.0.3",
+    "@octokit/core": "^7.0.8",
+    "@octokit/plugin-throttling": "^11.0.5",
     "@octokit/rest": "^22.0.1",
-    "adm-zip": "^0.5.16"
+    "adm-zip": "^0.6.1"
   },
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   "version": "1.0.0",
   "devDependencies": {
     "@microsoft/eslint-formatter-sarif": "^3.1.0",
-    "eslint": "^9.39.1",
-    "eslint-plugin-github": "^6.0.0"
+    "eslint": "^10.10.0",
+    "eslint-plugin-github": "^6.1.2"
   }
 }
